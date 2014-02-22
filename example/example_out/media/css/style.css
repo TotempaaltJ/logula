@@ -1,0 +1,218 @@
+html, head, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #eaeaea; }
+
+body {
+  overflow-y: scroll; }
+
+#container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0; }
+
+.red {
+  color: #ff0000; }
+
+.minor {
+  color: #888; }
+
+#top {
+  box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  height: 100%; }
+
+a:link, a:visited {
+  color: #f00;
+  transition: color 0.1s linear; }
+  a:link.nostyle, a:visited.nostyle {
+    color: inherit; }
+a:hover {
+  color: #a00; }
+  a:hover.nostyle {
+    color: #f00; }
+a:active, a:active.nostyle {
+  color: #600; }
+
+#header {
+  box-sizing: border-box;
+  height: 50px;
+  width: 100%;
+  padding: 0 25px;
+  font-family: 'Lato', sans-serif;
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: center; }
+  #header header {
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    font-size: 24px;
+    padding: 8px 25px; }
+  #header menu {
+    display: inline-block;
+    width: auto;
+    padding: 0;
+    margin: 0;
+    list-style-type: none; }
+    #header menu.right {
+      position: absolute;
+      left: auto;
+      right: 15px; }
+  #header li {
+    float: left;
+    height: 50px; }
+    #header li a {
+      box-sizing: border-box;
+      display: block;
+      height: 100%;
+      text-decoration: none;
+      color: rgba(0, 0, 0, 0.6);
+      padding: 15px 10px;
+      font-size: 18px;
+      transition: 0.1s linear color; }
+      #header li a:hover {
+        color: #f00; }
+      #header li a:active {
+        color: #000; }
+
+#hero {
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  background-size: 100% auto; }
+  #hero #bar {
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    margin-left: -350px;
+    height: 90px;
+    width: 700px;
+    font-family: 'Lato', sans-serif;
+    background-color: rgba(255, 255, 255, 0.9); }
+  #hero #newer, #hero #older {
+    z-index: 1;
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    left: 0;
+    padding: 0 30px;
+    float: left; }
+    #hero #newer a, #hero #older a {
+      display: block;
+      color: #888;
+      margin: 50% 0;
+      padding: 4px 0;
+      text-decoration: none;
+      font-size: 16px;
+      transition: 0.1s linear color; }
+      #hero #newer a:hover, #hero #older a:hover {
+        color: #f00; }
+      #hero #newer a:active, #hero #older a:active {
+        color: #000; }
+  #hero #older {
+    float: right;
+    left: auto;
+    right: 0; }
+    #hero #older a {
+      padding: 8px 0; }
+  #hero header {
+    text-align: center;
+    width: 460px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0;
+    position: absolute;
+    left: 50%;
+    margin-left: -230px;
+    display: table; }
+    #hero header h1 {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-size: 22px;
+      display: table-cell;
+      vertical-align: middle; }
+  #hero .minor {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    display: block;
+    font-size: 14px;
+    bottom: 4px; }
+
+#meta {
+  box-sizing: border-box;
+  font-family: 'Droid Sans', sans-serif;
+  width: 100%;
+  padding: 0;
+  margin: 0 auto 10px;
+  font-size: 15px;
+  overflow: auto; }
+  #meta #tags {
+    float: left; }
+  #meta #date {
+    float: right; }
+
+#post {
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 30px 40px;
+  text-align: justify;
+  width: 700px;
+  z-index: 1;
+  background-color: #fff;
+  font-family: 'Droid Sans', sans-serif;
+  font-size: 17px;
+  line-height: 1.7; }
+  #post p {
+    margin-top: 0;
+    margin-bottom: 40px; }
+    #post p:last-of-type {
+      margin-bottom: 0; }
+  #post figure {
+    display: block;
+    width: 700px;
+    margin: 0 -40px 40px; }
+    #post figure img {
+      max-width: 100%;
+      margin: 0; }
+    #post figure pre {
+      font-family: 'Ubuntu Mono', monospace;
+      border-left: 5px solid #555;
+      padding: 10px 15px;
+      margin: 0 0 10px; }
+    #post figure figcaption {
+      text-align: center;
+      font-size: 15px;
+      font-style: italic;
+      margin: 0; }
+    #post figure pre + figcaption {
+      text-align: inherit;
+      margin: 0; }
+  #post code {
+    font-family: 'Ubuntu Mono', monospace;
+    color: #333; }
+
+#footer {
+  box-sizing: border-box;
+  width: 700px;
+  margin: 30px auto;
+  padding-bottom: 20px;
+  font-family: 'Droid Sans', sans-serif;
+  font-size: 15px;
+  text-align: center; }

@@ -21,6 +21,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+*.sass-cache
 
 # Installer logs
 pip-log.txt

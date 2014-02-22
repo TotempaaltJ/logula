@@ -46,8 +46,8 @@ def find_dir(source):
 
 
 class PostGenerator(object):
-    def __init__(self, title, hero, tags, date, source, destination, theme,
-                 base_url, image_resizes=IMAGE_RESIZES):
+    def __init__(self, title, hero, tags, date, source, destination, base_url,
+                 image_resizes=IMAGE_RESIZES):
         # Post meta
         self.title = title
         self.hero = hero
@@ -66,9 +66,7 @@ class PostGenerator(object):
 
 
         # Set up Jinja2 environment.
-        self.tpl_env = Environment(
-            loader=FileSystemLoader(path.join('templates', theme))
-        )
+        self.tpl_env = Environment(loader=FileSystemLoader('templates'))
 
         # Base URL to use for images etc. (don't trailing slash!)
         self.base_url = base_url
@@ -222,7 +220,6 @@ if __name__ == '__main__':
         date,
         data.get('source', name),
         data['destination'],
-        data['theme'],
         data['base_url'],
         image_resizes=IMAGE_RESIZES
     )

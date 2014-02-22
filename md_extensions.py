@@ -11,24 +11,31 @@ class ImagePattern(Pattern):
     def handleMatch(self, m):
         gen = self.markdown.generator
         figure = etree.Element('figure')
+        picture = etree.SubElement(figure, 'picture')
 
         src_parts = m.group(9).split()
         alt = m.group(2)
-
-        figure.set('alt', alt)
+        picture.set('alt', alt)
 
         if src_parts:
             src = src_parts[0]
 
             files = gen.process_image(path.join(gen.img_dir, src))
             for f, size in files:
+                f = path.split(f)[-1]
+                f = path.join(gen.base_url, gen.dirname, 'img', f).replace('\\','/')
+
+                # Create a source element for every resized image.
                 if size in gen.image_resizes:
-                    source = etree.SubElement(figure, 'source')
+                    source = etree.SubElement(picture, 'source')
                     source.set('src', f)
+
+                    # No media attribute for smallest image.
                     if size != min(gen.image_resizes):
                         source.set('media', '(min-width:{}px)'.format(size))
                 else:
-                    noscript = etree.SubElement(figure, 'noscript')
+                    # In case of no Javascript, fall back image is full res.
+                    noscript = etree.SubElement(picture, 'noscript')
                     img = etree.SubElement(noscript, 'img')
                     img.set('src', f)
                     img.set('alt', alt)

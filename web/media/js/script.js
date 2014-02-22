@@ -1,4 +1,6 @@
 $(document).ready(function() {
+  $('picture').picture();
+
   var header = $('#header');
 
   header.css('position', 'fixed');

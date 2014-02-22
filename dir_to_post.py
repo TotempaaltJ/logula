@@ -38,35 +38,51 @@ def find_file(filename):
     return None
 
 
-def find_dir(dirname):
+def find_dir(source):
     """Return dir if directory exists, otherwise None."""
-    if path.isdir(dirname):
-        return dirname
+    if path.isdir(source):
+        return source
     return None
 
 
 class PostGenerator(object):
-    def __init__(self, title, tags, date, dirname, theme, image_resizes=IMAGE_RESIZES):
+    def __init__(self, title, hero, tags, date, source, destination, theme,
+                 base_url, image_resizes=IMAGE_RESIZES):
+        # Post meta
         self.title = title
+        self.hero = hero
         self.tags = tags
         self.date = date
 
-        self.dirname = dirname
+        # Filesystem information
+        self.source = source
+        if not path.isdir(source):
+            raise ValueError("Source must be a directory.")
+        self.destination = destination
+        self.dirname = path.split(destination)[-1]
+        if path.isdir(destination):
+            raise ValueError("Destination must not exist yet!")
+        os.makedirs(path.join(destination, 'img'))
+
+
+        # Set up Jinja2 environment.
         self.tpl_env = Environment(
             loader=FileSystemLoader(path.join('templates', theme))
         )
+
+        # Base URL to use for images etc. (don't trailing slash!)
+        self.base_url = base_url
+        # List of maximum widths for images
         self.image_resizes = image_resizes
 
-        if not path.isdir(dirname):
-            raise ValueError("That's not a directory.")
-
-        self.post_file = find_file(path.join(dirname, 'post.md')) or \
-                         find_file(path.join(dirname, 'post.html'))
+        # Check if there's a post file in the source directory.
+        self.post_file = find_file(path.join(source, 'content.md'))
         if self.post_file is None:
-            raise ValueError("No post.md or post.html file exists.")
+            raise ValueError("No post.md file exists.")
 
-        self.img_dir = find_dir(path.join(dirname, 'img'))
-        self.static_dir = find_dir(path.join(dirname, 'static'))
+        # Find image and static directories in source directory.
+        self.img_dir = find_dir(path.join(source, 'img'))
+        self.static_dir = find_dir(path.join(source, 'static'))
 
         self.images = []
 
@@ -83,17 +99,22 @@ class PostGenerator(object):
 
 
     def hyphenate(self):
+        """Put soft hyphenation characters in all text in the post HTML."""
         html = self.post_html
         final = html
         added_chars = 0
 
         text = True
         chars_left = 0
+        # We have to look through all characters individually to find words
+        # and filter out HTML code.
         for i, c in enumerate(html):
             if chars_left > 0:
                 chars_left -= 1
                 continue
 
+            # Text is true if we're in a text part, or false if we're looking
+            # at HTML.
             text = c == '>' if not text else not c == '<'
             if not text:
                 continue
@@ -118,33 +139,37 @@ class PostGenerator(object):
                 chars_left = len(new_word)
 
         self.post_html = final
-        print(self.post_html)
         return final
 
 
     def render_template(self):
-        """Renders tempate with post data."""
+        """Renders tempate with post data and writes to destination."""
+        hero = self.process_image(path.join(self.img_dir, self.hero), False)[0]
+        hero = path.join(gen.base_url, gen.dirname, 'img', path.split(hero[0])[-1])
+
         date = self.date.strftime('%A, %b %d, %Y')
         datetime = self.date.strftime('%Y-%m-%dT%H:%M:%S%z')
 
         post_tpl = self.tpl_env.get_template('post.html')
         html = post_tpl.render(
             title=self.title,
+            hero=hero.replace('\\','/'),
             tags=self.tags,
             date=date,
             datetime=datetime,
-            content=self.post_html
+            content=self.post_html,
+            base_url=self.base_url
         )
 
         # Write rendered HTML to file (possibly temp solution?).
-        f = open(path.join(self.dirname, 'post.html'), 'w')
+        f = open(path.join(self.destination, 'post.html'), 'w')
         f.write(html)
         f.close()
 
         return html
 
 
-    def process_image(self, image):
+    def process_image(self, image, resize=True):
         """
         Take one image, resize appropriately and convert to WebP. Returns
         names and sizes of created files.
@@ -154,9 +179,13 @@ class PostGenerator(object):
 
         im = Image.open(image)
         # Create a WebP copy of the full size image as well.
-        tmp_sizes = list(self.image_resizes) + [im.size[0]]
+        if resize:
+            tmp_sizes = list(self.image_resizes) + [im.size[0]]
+        else:
+            tmp_sizes = [im.size[0]]
         for width in tmp_sizes:
             outfile = path.splitext(image)[0] + "." + str(width)
+            outfile = path.join(self.destination, 'img', path.split(outfile)[-1])
 
             tmp_im = im.copy()
             # Find the proper height (maintaining ratio) for this width.
@@ -170,18 +199,33 @@ class PostGenerator(object):
         return files
 
 if __name__ == '__main__':
-    dirname = (sys.argv[1:2] or [input("What directory is the post in? ")])[0]
-    title = input("Title: ")
-    tags = input("Tags (comma separated): ").split(',')
-    print(tags)
-    date = input("Custom date? [y/N] ").lower()
-    if date in ("y", "yes"):
-        date = input("Date: (YYYY-MM-DDTHH:MM:SS+00:00) ")
-        date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z')
+    import yaml
+    name = sys.argv[1]
+    if path.isfile(name):
+        f = open(name, 'r')
+    elif path.isdir(name):
+        f = open(path.join(name, 'post.yaml'))
     else:
-        date = datetime.now()
+        raise ValueError("That's not a directory or file.")
 
-    gen = PostGenerator(title, tags, date, dirname, 'totj')
+    data = yaml.load(f)
+    f.close()
+
+    date = data.get('date', datetime.now())
+    if not isinstance(date, datetime):
+        date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z')
+
+    gen = PostGenerator(
+        data['title'],
+        data.get('hero', 'hero.jpg'),
+        data.get('tags', []),
+        date,
+        data.get('source', name),
+        data['destination'],
+        data['theme'],
+        data['base_url'],
+        image_resizes=IMAGE_RESIZES
+    )
 
     print("Converting Markdown file...")
     gen.render_markdown()

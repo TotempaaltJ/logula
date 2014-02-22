@@ -48,8 +48,8 @@ class PostGenerator(object):
         if not path.isdir(dirname):
             raise ValueError("That's not a directory.")
 
-        self.post_file = find_file(path.join(dirname, 'post.md') or \
-                         find_file(path.join(dirname, 'post.html')
+        self.post_file = find_file(path.join(dirname, 'post.md')) or \
+                         find_file(path.join(dirname, 'post.html'))
         if self.post_file is None:
             raise ValueError("No post.md or post.html file exists.")
 
@@ -65,7 +65,7 @@ class PostGenerator(object):
                and entry[entry.rfind('.'):].lower() in extensions:
                 self.images.append(entry)
 
-    def process_images(self, sizes=IMAGES_RESIZES):
+    def process_images(self, sizes=IMAGE_RESIZES):
         """Take the images in self.images and resize them appropriately."""
         for image in self.images:
             im = Image.open(image)

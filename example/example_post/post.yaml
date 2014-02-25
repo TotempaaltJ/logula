@@ -7,5 +7,4 @@ tags:
 # date: 2014-22-02T14:35:30-05:00
 # source: example_post
 destination: web/output
-theme: totj
-base_url: /Users/Martijn/Documents/GitHub/logula/web/
+base_url: /Users/Martijn/Documents/GitHub/logula/example_out/

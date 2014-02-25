@@ -16,8 +16,6 @@ if not hyphen.dictools.is_installed('en_US'): hyphen.dictools.install('en_US')
 h = hyphen.Hyphenator('en_US')
 
 # DEFAULTS
-# A list of all known image file extensions.
-IMAGE_EXT = ('.jpg', '.jpeg', '.png', '.gif', '.tif')
 # Common screen resolutions to fit images in (defaults are all about width).
 # None means auto-adapt.
 IMAGE_RESIZES = (
@@ -143,7 +141,7 @@ class PostGenerator(object):
     def render_template(self):
         """Renders tempate with post data and writes to destination."""
         hero = self.process_image(path.join(self.img_dir, self.hero), False)[0]
-        hero = path.join(gen.base_url, gen.dirname, 'img', path.split(hero[0])[-1])
+        hero = path.join(self.base_url, self.dirname, 'img', path.split(hero[0])[-1])
 
         date = self.date.strftime('%A, %b %d, %Y')
         datetime = self.date.strftime('%Y-%m-%dT%H:%M:%S%z')

@@ -2,7 +2,7 @@
 import os
 from os import path
 import sys, codecs
-from datetime import datetime
+import arrow
 from string import ascii_letters
 
 import markdown, md_extensions
@@ -58,10 +58,9 @@ class PostGenerator(object):
             raise ValueError("Source must be a directory.")
         self.destination = destination
         self.dirname = path.split(destination)[-1]
-        if path.isdir(destination):
-            raise ValueError("Destination must not exist yet!")
-        os.makedirs(path.join(destination, 'img'))
-
+        #if path.isdir(destination):
+        #    raise ValueError("Destination must not exist yet!")
+        #os.makedirs(path.join(destination, 'img'))
 
         # Set up Jinja2 environment.
         self.tpl_env = Environment(loader=FileSystemLoader('templates'))
@@ -85,12 +84,18 @@ class PostGenerator(object):
 
     def render_markdown(self):
         """Convert post_file from Markdown to HTML."""
-        post = codecs.open(self.post_file, mode="r", encoding="utf-8")
+        with codecs.open(self.post_file, mode="r", encoding="utf-8") as f:
+            source = f.read()
 
         md = markdown.Markdown(extensions=[md_extensions.LogulaExt()])
         md.generator = self
 
-        self.post_html = md.convert(post.read())
+        # Copy markdown file to destination/sources
+        filename = '{}-{}.md'.format(self.date.timestamp, self.dirname)
+        with open(path.join(self.destination, 'sources', self.filename, 'w')) as f:
+            f.write(source)
+
+        self.post_html = md.convert(source)
         return self.post_html
 
 
@@ -146,19 +151,39 @@ class PostGenerator(object):
         date = self.date.strftime('%A, %b %d, %Y')
         datetime = self.date.strftime('%Y-%m-%dT%H:%M:%S%z')
 
+        data = {
+            'title': self.title,
+            'hero': hero.replace('\\','/'),
+            'tags': self.tags,
+            'date': date,
+            'datetime': datetime,
+            'content': self.post_html,
+            'base_url': self.base_url,
+        }
+
+        # Figure out if there's a previous or next blogpost we should include.
+        timestamp = self.date.timestamp
+
+        posts = os.listdir(path.join(self.destination, 'sources'))
+        newer, older = [], []
+
+        get_stamp = lambda s: int(s[:s.find('-')])
+        for post in posts:
+            if not post.endswith('.md'): continue
+            if get_stamp(post) > self.date.timestamp:
+                newer.append(post)
+            else:
+                older.append(post)
+        data['newer'] = min(newer, key=get_stamp)
+        data['older'] = max(older, key=get_stamp)
+        print(data['next'], data['previous'])
+
         post_tpl = self.tpl_env.get_template('post.html')
-        html = post_tpl.render(
-            title=self.title,
-            hero=hero.replace('\\','/'),
-            tags=self.tags,
-            date=date,
-            datetime=datetime,
-            content=self.post_html,
-            base_url=self.base_url
-        )
+        html = post_tpl.render(**data)
 
         # Write rendered HTML to file (possibly temp solution?).
-        f = open(path.join(self.destination, 'post.html'), 'w')
+        filename = '{}-{}.html'.format(self.date.timestamp, self.dirname)
+        f = open(path.join(self.destination, filename), 'w')
         f.write(html)
         f.close()
 
@@ -207,9 +232,9 @@ if __name__ == '__main__':
     data = yaml.load(f)
     f.close()
 
-    date = data.get('date', datetime.now())
-    if not isinstance(date, datetime):
-        date = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z')
+    date = data.get('date', arrow.now())
+    if not isinstance(date, arrow):
+        date = arrow.get(date)
 
     gen = PostGenerator(
         data['title'],

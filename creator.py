@@ -5,7 +5,7 @@ app = Flask(__name__)
 import os
 from os import path
 import random
-from datetime import datetime
+import arrow
 from hashlib import md5
 
 import yaml, json
@@ -114,7 +114,7 @@ def publish():
         data['title'],
         data.get('hero') or 'hero.jpg',
         data.get('tags') or [],
-        datetime.now(),
+        arrow.now(),
         path.join(config['wip_dir'], slug),
         path.join(config['publish_dir'], slug),
         data['base_url'],

@@ -3,11 +3,17 @@ __pycache__/
 *Thumbs.db
 
 example/posts/*
-!example/posts/example_post
+!example/posts/example_post/
 example/www/*
 !example/www/example_post.html
 
-!example/www/sources
+!example/www/media/
+example/www/media/*
+!example/www/media/img/
+example/www/media/img/*
+!example/www/media/img/anne_frank_diary*
+
+!example/www/sources/
 example/www/sources/*
 !example/www/sources/*example_post.md
 

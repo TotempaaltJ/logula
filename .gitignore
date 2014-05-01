@@ -2,6 +2,15 @@ __pycache__/
 *.py[cod]
 *Thumbs.db
 
+example/posts/*
+!example/posts/example_post
+example/www/*
+!example/www/example_post.html
+
+!example/www/sources
+example/www/sources/*
+!example/www/sources/*example_post.md
+
 # C extensions
 *.so
 

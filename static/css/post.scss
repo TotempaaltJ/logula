@@ -1,0 +1,77 @@
+#meta {
+  box-sizing: border-box;
+
+  font-family: 'Droid Sans', sans-serif;
+  width: 100%;
+  padding: 0;
+  margin: 0 auto 10px;
+  font-size: 15px;
+  overflow: auto;
+
+  #tags {
+    float: left;
+  }
+  #date {
+    float: right;
+  }
+}
+
+#post {
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 30px 40px;
+  text-align: justify;
+
+  width: 700px;
+  z-index: 1;
+  background-color: #fff;
+
+  font-family: 'Droid Sans', sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+
+  p {
+    margin: {
+      top: 0;
+      bottom: 40px;
+    }
+
+    &:last-of-type {
+      margin-bottom: 0;
+    }
+  }
+
+  figure {
+    display: block;
+    width: 700px;
+    margin: 0 -40px 40px;
+
+    img {
+      max-width: 100%;
+      margin: 0;
+    }
+
+    pre {
+      font-family: 'Ubuntu Mono', monospace;
+      border-left: 5px solid #555;
+      padding: 10px 15px;
+      margin: 0 0 10px;
+    }
+
+    figcaption {
+      text-align: center;
+      font-size: 15px;
+      font-style: italic;
+      margin: 0;
+    }
+    pre + figcaption {
+      text-align: inherit;
+      margin: 0;
+    }
+  }
+
+  code {
+    font-family: 'Ubuntu Mono', monospace;
+    color: #333;
+  }
+}

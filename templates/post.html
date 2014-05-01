@@ -10,12 +10,12 @@
       <div id="top">
         <div id="hero" style="background-image: url('{{ hero }}')">
           <div id="bar">
-            <div id="newer"><a href="#">&lt; newer</a></div>
+            <div id="newer">{% if newer %}<a href="{{ newer }}">&lt; newer</a>{% endif %}</div>
             <header>
               <h1>{{ title }}</h1>
             </header>
             <span id="scrolldown" class="minor">scroll down to read</span>
-            <div id="older"><a href="#">older &gt;</a></div>
+            <div id="older">{% if older %}<a href="{{ older }}">older &gt;</a>{% endif %}</div>
           </div>
         </div>
       </div>

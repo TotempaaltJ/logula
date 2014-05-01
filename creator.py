@@ -107,23 +107,13 @@ def publish():
     if not verify(request.form['code']): abort(403)
     slug = request.form['slug']
 
-    with open(path.join(config['wip_dir'], slug, 'post.yaml'), 'r') as f:
-        yaml.load(f)
-
-    gen = logula.PostGenerator(
-        data['title'],
-        data.get('hero') or 'hero.jpg',
-        data.get('tags') or [],
-        arrow.now(),
+    logula.publish_post(
         path.join(config['wip_dir'], slug),
-        path.join(config['publish_dir'], slug),
-        data['base_url'],
-        image_resizes=logula.IMAGE_RESIZES
+        config['publish_dir'],
+        config['img_dir'],
+        config['base_url'],
+        config['img_url']
     )
-
-    gen.render_markdown()
-    gen.hyphenate()
-    gen.render_template()
 
     return 'published'
 

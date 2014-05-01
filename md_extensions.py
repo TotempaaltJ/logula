@@ -23,7 +23,7 @@ class ImagePattern(Pattern):
             files = gen.process_image(path.join(gen.img_dir, src))
             for f, size in files:
                 f = path.split(f)[-1]
-                f = path.join(gen.base_url, gen.dirname, 'img', f).replace('\\','/')
+                f = path.join(gen.img_url, f).replace('\\','/')
 
                 # Create a source element for every resized image.
                 if size in gen.image_resizes:

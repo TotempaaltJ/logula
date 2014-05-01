@@ -1,7 +1,9 @@
 username: TotempaaltJ
 password: testest
 
-wip_dir: posts_wip
-publish_dir: example\example_out
+wip_dir: example\posts
+publish_dir: example\www
+img_dir: example\www\media\img
 
-base_url: /Users/Martijn/Documents/GitHub/logula/example/example_out/
+base_url: /Users/Martijn/Documents/GitHub/logula/example/www/
+img_url: /Users/Martijn/Documents/GitHub/logula/example/www/media/img

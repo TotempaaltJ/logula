@@ -274,13 +274,6 @@ textarea, .hiddendiv {
   left: 0;
   width: 100%;
 
-  -webkit-transition: opacity 0.1s linear;
-  opacity: 0.2;
-
-  &:hover {
-    opacity: 1;
-  }
-
   div {
     position: relative;
     box-sizing: border-box;

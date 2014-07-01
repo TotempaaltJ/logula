@@ -1,4 +1,6 @@
 base_url: /Users/Martijn/Documents/GitHub/logula/example/www/
+date: '2014-06-01T00:51:20.398280-04:00'
 hero: ''
-tags: []
+slug: example_post
+tags: [test1, test2, example, lol]
 title: Example Post

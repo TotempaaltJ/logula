@@ -1,60 +1,40 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>{{ title }} by TotempaaltJ</title>
+    <title>Archive of TotempaaltJ's Blog</title>
     <link href="http://fonts.googleapis.com/css?family=Droid+Sans:400|Lato:900|Ubuntu+Mono:400" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="{{ base_url }}media/css/style.css">
   </head>
   <body>
     <div id="container">
-      <div id="top">
-        <div id="hero" style="background-image: url('{{ hero }}')">
-          <div id="bar">
-            <div id="newer">{% if newer %}<a href="{{ newer }}">&lt; newer</a>{% endif %}</div>
-            <header>
-              <h1>{{ title }}</h1>
-            </header>
-            <span id="scrolldown" class="minor">scroll down to read</span>
-            <div id="older">{% if older %}<a href="{{ older }}">older &gt;</a>{% endif %}</div>
-          </div>
-        </div>
-      </div>
-
       <div id="header">
         <header>
           <a href="http://totempaal.tj/">totempaal<span class="red">.</span>tj</a>
         </header>
         <menu class="right">
-          <li><a href="/archive">archive</a></li>
+          <li><a class="active" href="/archive">archive</a></li>
           <li><a href="http://martijnarts.com" id="aboutlink">about/portfolio</a></li>
         </menu>
       </div>
 
-
-      <div id="post">
-        <div id="meta" class="minor">
-          <div id="tags">
-          Tags:
-            {% for tag in tags %}
-              <a href="/archive.html?tags={{ tag }}" class="nostyle">{{ tag }}</a>
-            {% endfor %}
+      <ul id="archive">
+      {% for post in posts %}
+        <li id="{{ post.slug }}" class="{% for tag in post.tags %}tag-{{ tag }} {% endfor %}">
+          <div id="meta" class="minor">
+            <div id="tags">
+            Tags:
+              {% for tag in post.tags %}
+                <a href="/archive.html?tags={{ tag }}" class="nostyle">{{ tag }}</a>
+              {% endfor %}
+            </div>
+            <div id="date">
+              <time datetime="{{ post.date.strftime('%Y-%m-%dT%H:%M:%S%z') }}">{{ post.date.strftime('%A, %b %d, %Y') }}</time>
+            </div>
           </div>
-          <div id="date">
-            <time datetime="{{ datetime }}">{{ date }}</time>
-          </div>
-        </div>
-
-        {{ content }}
-
-        {#
-          <figure>
-            <pre><code>.c {
-  background-color: #efefef;
-}</code></pre>
-            <figcaption>This is a piece of code, as you, I think, can see.</figcaption>
-          </figure>
-        #}
-      </div>
+          <a href="{{ post.slug }}.html">{{ post.title }} &gt;</a>
+        </li>
+      {% endfor %}
+      </ul>
 
       <div id="footer" class="minor">
         <footer>

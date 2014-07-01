@@ -18,7 +18,10 @@ $(function(){
   }
 
   // Save
-  $('#save').click(function() {
+  function save(publish, on_success) {
+    if($('#slug').val() == '') { return; }
+    if(typeof(publish) === 'undefined') { publish = false; }
+
     $.ajax({
         type: 'POST',
         url: '/save',
@@ -26,12 +29,17 @@ $(function(){
             'code': AUTH_CODE,
             'title': $('#title').val(),
             'slug': $('#slug').val(),
-            'content': $('#content').val()
+            'date': $('#date').val(),
+            'tags': $('#tags').val(),
+            'content': $('#content').val(),
+            'publish': publish
         },
         success: function() {
           $('#save').removeClass('error').removeClass('success');
           $('#save').addClass('success');
           setTimeout(save_clear, 2000);
+
+          if(typeof(on_success) !== 'undefined') { on_success(); }
         },
         error: function() {
           $('#save').removeClass('error').removeClass('success');
@@ -39,30 +47,34 @@ $(function(){
           setTimeout(save_clear, 2000);
         }
     });
-  });
+  }
+
+  $('#save').click(save);
   function save_clear() {
     $('#save').removeClass('error').removeClass('success');
   }
 
   // Publish
   $('#publish').click(function() {
-    $.ajax({
-        type: 'POST',
-        url: '/publish',
-        data: {
-            'code': AUTH_CODE,
-            'slug': $('#slug').val(),
-        },
-        success: function() {
-          $('#publish').removeClass('error').removeClass('success');
-          $('#publish').addClass('success');
-          setTimeout(publish_clear, 2000);
-        },
-        error: function() {
-          $('#publish').removeClass('error').removeClass('success');
-          $('#publish').addClass('error');
-          setTimeout(publish_clear, 2000);
-        }
+    save(true, function(){
+      $.ajax({
+          type: 'POST',
+          url: '/publish',
+          data: {
+              'code': AUTH_CODE,
+              'slug': $('#slug').val(),
+          },
+          success: function() {
+            $('#publish').removeClass('error').removeClass('success');
+            $('#publish').addClass('success');
+            setTimeout(publish_clear, 2000);
+          },
+          error: function() {
+            $('#publish').removeClass('error').removeClass('success');
+            $('#publish').addClass('error');
+            setTimeout(publish_clear, 2000);
+          }
+      });
     });
   });
   function publish_clear() {
@@ -118,6 +130,8 @@ $(function(){
   function finish_load_wip(data) {
     $('#title').val(data.title).trigger("checkval");
     $('#slug').val(data.slug).prop('disabled', true);
+    $('#date').val(data.date);
+    $('#tags').val(data.tags);
     $('#content').val(data.content).trigger("checkval");
 
     $('#images').find('li').remove();
@@ -139,6 +153,7 @@ $(function(){
         new_val = $(this).val(),
         li = $(this).parent();
     if(original == new_val) { return }
+    if(li.children('input').prop('disabled')) { return }
 
     li.children('input').prop('disabled', true);
     $.ajax({

@@ -1,6 +1,6 @@
 #!/usr/bin/python
+import os
 from os import path
-
 
 from markdown.extensions import Extension
 from markdown.inlinepatterns import Pattern, IMAGE_LINK_RE
@@ -22,8 +22,8 @@ class ImagePattern(Pattern):
 
             files = gen.process_image(path.join(gen.img_dir, src))
             for f, size in files:
-                f = path.split(f)[-1]
-                f = path.join(gen.img_url, f).replace('\\','/')
+                f = f.split(os.sep)[-2:]
+                f = path.join(gen.img_url, *f).replace('\\','/')
 
                 # Create a source element for every resized image.
                 if size in gen.image_resizes:
@@ -33,12 +33,13 @@ class ImagePattern(Pattern):
                     # No media attribute for smallest image.
                     if size != min(gen.image_resizes):
                         source.set('media', '(min-width:{}px)'.format(size))
-                else:
-                    # In case of no Javascript, fall back image is full res.
-                    noscript = etree.SubElement(picture, 'noscript')
-                    img = etree.SubElement(noscript, 'img')
-                    img.set('src', f)
-                    img.set('alt', alt)
+
+                    # Largest is default too
+                    if size == max(gen.image_resizes):
+                        noscript = etree.SubElement(picture, 'noscript')
+                        img = etree.SubElement(noscript, 'img')
+                        img.set('src', f)
+                        img.set('alt', alt)
 
         return figure
 

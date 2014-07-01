@@ -47,6 +47,11 @@ def save():
     title = request.form['title']
     slug = request.form['slug']
     content = request.form['content']
+    tags = [t.strip() for t in request.form['tags'].split(',')]
+    date = request.form['date']
+    print(request.form['publish'])
+    if request.form['publish'] == 'true' and date == '':
+        date = arrow.now().isoformat()
 
     post_dir = path.join(config['wip_dir'], slug)
     if not path.isdir(post_dir):
@@ -54,9 +59,11 @@ def save():
 
     meta = open(path.join(post_dir, 'post.yaml'), 'w')
     yaml.dump({
+        'date': date,
         'title': title,
+        'slug': slug,
         'hero': '',
-        'tags': [],
+        'tags': tags,
         'base_url': config['base_url'],
     }, meta)
     meta.close()

@@ -9,6 +9,7 @@ import markdown, md_extensions
 from PIL import Image
 from jinja2 import Environment, FileSystemLoader
 import yaml
+import json
 
 # Prepare hyphen, load (or install) dictionary...
 import hyphen
@@ -21,12 +22,8 @@ h = hyphen.Hyphenator('en_US')
 # None means auto-adapt.
 IMAGE_RESIZES = (
     480,
-    #600,
-    #768,
-    900,
-    #1080,
-    #1200,
-    1600,
+    640,
+    700,
 )
 
 
@@ -62,9 +59,6 @@ class PostGenerator(object):
         self.dest_img_dir = dest_img_dir
 
         self.slug = path.split(source)[-1]
-        #if path.isdir(destination):
-        #    raise ValueError("Destination must not exist yet!")
-        #os.makedirs(path.join(destination, 'img'))
 
         # Set up Jinja2 environment.
         self.tpl_env = Environment(loader=FileSystemLoader('templates'))
@@ -164,7 +158,7 @@ class PostGenerator(object):
         hero_path = path.join(self.img_dir, self.hero)
         if path.isfile(hero_path):
             hero = self.process_image(hero_path, False)[0]
-            hero = path.join(self.img_dir, path.split(hero[0])[-1])
+            hero = path.join(self.img_url, self.slug, path.split(hero[0])[-1])
             hero = hero.replace('\\','/') # in case of windows...
         else:
             hero = False
@@ -201,7 +195,7 @@ class PostGenerator(object):
             else:
                 older.append(post)
         if newer != []:
-            newer_slug = get_slug(max(newer, key=get_stamp))
+            newer_slug = get_slug(min(newer, key=get_stamp))
             data['newer'] = newer_slug + '.html'
 
             if self.neighbours:
@@ -214,7 +208,7 @@ class PostGenerator(object):
                     False
                 )
         if older != []:
-            older_slug = get_slug(min(older, key=get_stamp))
+            older_slug = get_slug(max(older, key=get_stamp))
             data['older'] = older_slug + '.html'
 
             if self.neighbours:
@@ -239,6 +233,33 @@ class PostGenerator(object):
         return html
 
 
+    def render_archive(self):
+        posts_dir = os.listdir(path.join(self.destination, 'sources'))
+        posts = []
+        for post in posts_dir:
+            if not post.endswith('.md'): continue
+            slug = post[post.find('-')+1:-3]
+            time = arrow.get(int(post[:post.find('-')]))
+
+            wip_dir = path.join(*self.source.split(os.sep)[:-1])
+            real_src = path.join(wip_dir, slug, 'post.yaml')
+            with open(real_src, 'r') as y:
+                data = yaml.load(y)
+                data['date'] = arrow.get(data['date'])
+
+            posts.append(data)
+
+        posts.sort(key=lambda p: p['date'])
+        posts.reverse()
+
+        archive_tpl = self.tpl_env.get_template('archive.html')
+        html = archive_tpl.render(posts=posts)
+        f = open(path.join(self.destination, 'archive.html'), 'w')
+        f.write(html)
+
+        return html
+
+
     def process_image(self, image, resize=True):
         """
         Take one image, resize appropriately and convert to WebP. Returns
@@ -254,8 +275,14 @@ class PostGenerator(object):
         else:
             tmp_sizes = [im.size[0]]
         for width in tmp_sizes:
+            outdir = path.join(self.dest_img_dir, self.slug)
+            if not path.exists(outdir):
+                os.makedirs(outdir)
             outfile = path.splitext(image)[0] + "." + str(width)
-            outfile = path.join(self.dest_img_dir, path.split(outfile)[-1])
+            outfile = path.join(outdir, path.split(outfile)[-1])
+            if path.isfile(outfile + '.webp'):
+                files.append((outfile + '.webp', width))
+                continue
 
             tmp_im = im.copy()
             # Find the proper height (maintaining ratio) for this width.
@@ -274,12 +301,13 @@ def publish_post(post_dir, publish_dir, img_dir, base_url, img_url, neighbours=T
     with open(path.join(post_dir, 'post.yaml'), 'r') as f:
         data = yaml.load(f)
 
+    print(path.join(post_dir, 'post.yaml'), data.get('date'))
     gen = PostGenerator(
         data['title'],
         data.get('hero') or 'hero.jpg',
         data.get('tags') or [],
         # Current date or published date (TODO: last update? Changelog?)
-        arrow.get(data.get('tags') or arrow.now()),
+        arrow.get(data.get('date') or arrow.now()),
         post_dir,
         publish_dir,
         img_dir,
@@ -292,6 +320,8 @@ def publish_post(post_dir, publish_dir, img_dir, base_url, img_url, neighbours=T
     gen.render_markdown()
     gen.hyphenate()
     gen.render_template()
+    if neighbours:
+        gen.render_archive()
     return True
 
 

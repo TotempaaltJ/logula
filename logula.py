@@ -207,6 +207,9 @@ class PostGenerator(object):
                     self.img_url,
                     False
                 )
+            newest = False
+        else:
+            newest = True
         if older != []:
             older_slug = get_slug(max(older, key=get_stamp))
             data['older'] = older_slug + '.html'
@@ -226,9 +229,12 @@ class PostGenerator(object):
 
         # Write rendered HTML to file (possibly temp solution?).
         filename = '{}.html'.format(self.slug)
-        f = open(path.join(self.destination, filename), 'w')
-        f.write(html)
-        f.close()
+        with open(path.join(self.destination, filename), 'w') as f:
+            f.write(html)
+
+        if newest:
+            with open(path.join(self.destination, 'index.html'), 'w') as f:
+                f.write(html)
 
         return html
 
@@ -241,8 +247,7 @@ class PostGenerator(object):
             slug = post[post.find('-')+1:-3]
             time = arrow.get(int(post[:post.find('-')]))
 
-            wip_dir = path.join(*self.source.split(os.sep)[:-1])
-            real_src = path.join(wip_dir, slug, 'post.yaml')
+            real_src = path.join(self.wip_dir, slug, 'post.yaml')
             with open(real_src, 'r') as y:
                 data = yaml.load(y)
                 data['date'] = arrow.get(data['date'])

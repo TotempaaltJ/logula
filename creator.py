@@ -1,6 +1,7 @@
 from flask import Flask, abort, request, render_template
 from werkzeug.utils import secure_filename
 app = Flask(__name__)
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
 import os
 from os import path

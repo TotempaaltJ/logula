@@ -12,7 +12,7 @@
   top: 0;
   z-index: 1;
 
-  background-color: rgba(255, 255, 255, 0.8);
+  //background-color: rgba(255, 255, 255, 0.8);
   text-align: center;
 
   header {
@@ -24,6 +24,11 @@
     height: 100%;
     font-size: 24px;
     padding: 8px 25px;
+
+    a {
+      @extend .nostyle;
+      text-decoration: none;
+    }
   }
 
   menu {
@@ -44,6 +49,7 @@
     height: 50px;
 
     a {
+      @extend .nostyle;
       box-sizing: border-box;
       display: block;
       height: 100%;
@@ -52,13 +58,28 @@
       padding: 15px 10px;
       font-size: 18px;
 
-      transition: 0.1s linear color;
-      &:hover {
+      &.active {
         color: #f00;
       }
-      &:active {
-        color: #000;
-      }
+    }
+  }
+}
+
+@media all and (max-width: 700px) {
+  #header {
+    width: 100%;
+
+    menu.right {
+      right: 0;
+    }
+    header {
+      padding: 8px 10px;
+      font-size: 18px;
+      padding: 5px 5px;
+    }
+    li a {
+      font-size: 18px;
+      padding: 5px 5px;
     }
   }
 }

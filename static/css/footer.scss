@@ -9,3 +9,9 @@
   text-align: center;
 
 }
+
+@media all and (max-width: 700px) {
+  #footer {
+    width: 100%;
+  }
+}

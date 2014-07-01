@@ -15,9 +15,14 @@ body {
   position: relative;
 
   width: 100%;
-  height: 100%;
   margin: 0;
-  padding: 0;
+  padding: 120px 0 0 0;
+  background-color: #eaeaea;
+}
+@media all and (max-width: 700px) {
+  #container {
+    padding: 35px 0 0 0;
+  }
 }
 .red {
   color: #ff0000;
@@ -41,7 +46,7 @@ a {
       color: inherit;
     }
 
-    transition: color 0.1s linear;
+    transition: color 0.2s linear;
   }
   &:hover {
     color: #a00;
@@ -59,3 +64,4 @@ a {
 @import "hero";
 @import "post";
 @import "footer";
+@import "archive";
